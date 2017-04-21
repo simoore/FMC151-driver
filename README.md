@@ -12,14 +12,15 @@ inserted into the FMC LPC connector on the KC705 board. The IP blocks
 [io_clk_sys.xci](io_clk_sys.xci) and [io_clk_adc.xci](io_clk_adc.xci) configure
 the clocking resources and were generated in Vivado 2015.4. io_clk_sys.xci 
 configures the 200MHz differential input clock on the KC705 board to provide a 
-single 200MHz clock output. io_clk_adc.xci configures the 245.76MHz 
-differential input clock on the FMC151 card to provide 245.76MHz and 491.52MHz 
-clock outputs.
+single 200MHz clock output. io_clk_adc.xci configures the differential input 
+clock on the FMC151 card, currently configured for 122.88MHz in 
+[io_init_clock.v](io_init_clock.v). This provides a 122.88MHz and a 245.76MHz 
+clock output.
 
 [io_main.v](io_main.v) is the top level project file. To connect your system
 to the analog card, use the signals `adc_a`, `adc_b`, `dac_a`, & `dac_b`. 
-They are synchronised to the clock signal `clk_245_76MHz` and the reset 
-signal `rst_sync_adc`. All the ADCs and DACs sample at 245.76MSPS with the 
+They are synchronised to the clock signal `clk_adc` and the reset 
+signal `rst_sync_adc`. All the ADCs and DACs sample at 122.88MSPS with the 
 initialisation modules provided in this project.
 
 

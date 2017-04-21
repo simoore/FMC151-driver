@@ -95,15 +95,22 @@ module io_init_clock (
         start_tx <= state == START_SPI;
     end
     
+    localparam DIV1 = 7'b0100000;
+    localparam DIV2 = 7'b1000000;
+    localparam DIV4 = 7'b1000010;
+    
     initial begin
         mem[00] = 32'h683C0250;
         mem[01] = 32'h68000271;
-        mem[02] = 32'h83800002;
+        // mem[02] = 32'h83800002;  // default value (DIV2)
+        mem[02] = {8'h83,DIV4,13'h0000,4'h2};
         mem[03] = 32'h68000003;
-        mem[04] = 32'hE9800004;
+        // mem[04] = 32'hE9800004;  // default value (DIV2)
+        mem[04] = {8'hE9,DIV4,13'h0000,4'h4};
         mem[05] = 32'h68000005;
         mem[06] = 32'h68000006;
-        mem[07] = 32'h83400157;
+        // mem[07] = 32'h83400157; // default value (DIV1)
+        mem[07] = {8'h83,DIV2,13'h0015,4'h7};
         mem[08] = 32'h680001D8;
         mem[09] = 32'h68050C49;
         mem[10] = 32'h05FC270A;

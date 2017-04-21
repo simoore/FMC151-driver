@@ -45,8 +45,8 @@ module io_main (
     * Signal declarations.
     ***************************************************************************/
     wire clk_200MHz; 
-    wire clk_245_76MHz; 
-    wire clk_491_52MHz; 
+    wire clk_adc; 
+    wire clk_adc_ddr; 
     wire clk_sys_locked; 
     wire clk_adc_locked;
     wire init_done;
@@ -64,7 +64,7 @@ module io_main (
     * and dac_b are the two DAC channels. They are synchronised to the 
     * clk_245_76MHz clock.
     ***************************************************************************/
-    always @(posedge clk_245_76MHz) begin
+    always @(posedge clk_adc) begin
         if (rst_sync_adc)   dac_a <= 16'b0;
         else                dac_a <= {adc_a,2'b0};
         if (rst_sync_adc)   dac_b <= 16'b0;
@@ -81,11 +81,11 @@ module io_main (
         .reset          (cpu_reset), 
         .locked         (clk_sys_locked));
     
-    io_clk_adc clk_adc (
+    io_clk_adc clk_adc_inst (
         .clk_in1_p      (clk_ab_p), 
         .clk_in1_n      (clk_ab_n), 
-        .clk_out1       (clk_245_76MHz),
-        .clk_out2       (clk_491_52MHz),
+        .clk_out1       (clk_adc),
+        .clk_out2       (clk_adc_ddr),
         .reset          (cpu_reset), 
         .locked         (clk_adc_locked));    
         
@@ -96,7 +96,7 @@ module io_main (
         .rst_sync       (rst_sync_sys));
         
     io_reset_synchroniser reset_synchroniser_adc (
-        .clk            (clk_245_76MHz), 
+        .clk            (clk_adc), 
         .locked         (clk_adc_locked), 
         .cpu_reset      (cpu_reset), 
         .rst_sync       (rst_sync_adc));
@@ -138,14 +138,14 @@ module io_main (
     * the ADC delay calibration.
     ***************************************************************************/
     io_synchroniser done_signal ( 
-        .clk_in     (clk_245_76MHz), 
+        .clk_in     (clk_adc), 
         .clk_out    (clk_200MHz), 
         .data_in    (adc_calibrated_fast), 
         .data_out   (adc_calibrated_slow));
         
      io_synchroniser start_signal (
         .clk_in     (clk_200MHz), 
-        .clk_out    (clk_245_76MHz), 
+        .clk_out    (clk_adc), 
         .data_in    (start_calibration_slow), 
         .data_out   (start_calibration_fast));
         
@@ -154,7 +154,7 @@ module io_main (
     ***************************************************************************/  
     io_main_adc adc_driver (
         .rst            (rst_sync_adc), 
-        .clk            (clk_245_76MHz), 
+        .clk            (clk_adc), 
         .clk_200MHz     (clk_200MHz),
         .cha_p          (cha_p), 
         .cha_n          (cha_n), 
@@ -167,8 +167,8 @@ module io_main (
             
      io_main_dac dac_driver (
         .rst            (rst_sync_adc), 
-        .clk            (clk_491_52MHz), 
-        .clk_2          (clk_245_76MHz),
+        .clk            (clk_adc_ddr), 
+        .clk_2          (clk_adc),
         .dac_a          (dac_a), 
         .dac_b          (dac_b),
         .dac_clk_p      (dac_clk_p), 
@@ -187,7 +187,7 @@ module io_main (
         if (rst_sync_sys == 1)  sys_count <= 0;
         else                    sys_count <= sys_count + 1;
             
-    always @(posedge clk_245_76MHz)
+    always @(posedge clk_adc)
         if (rst_sync_adc == 1)  adc_count <= 0;
         else                    adc_count <= adc_count + 1;
             
